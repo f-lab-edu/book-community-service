@@ -4,6 +4,7 @@ import com.bookservice.common.time.TimeStamped;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,4 +20,8 @@ public class Author extends TimeStamped {
 	@NotNull
 	private String name;
 
+	@Builder
+	public Author(String name) {
+		this.name = name;
+	}
 }
