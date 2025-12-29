@@ -2,7 +2,7 @@
 책에 대한 정보를 공유하고 소통하는 커뮤니티 서비스입니다.
 
 ## 🕸️ 프로젝트 erd
-<img width="2000" height="2000" alt="unnamed-2025-12-29T13_59_17" src="https://github.com/user-attachments/assets/1900c621-9bba-4d9e-8812-3e54188cea44" />
+<img width="2000" height="2000" alt="unnamed-2025-12-29T23_47_51" src="https://github.com/user-attachments/assets/57ea47b7-0a8c-491d-8b8f-a53921d4b719" />
 
 ## 💻 clean commit
 - 제목의 길이는 최대 48글자까지 한글로 간단 명료하게 작성
