@@ -28,4 +28,9 @@ public class AuthorController {
 		return new ResponseEntity<>(new SuccessMessage<>("작가정보수정성공", null), HttpStatus.OK);
 	}
 
+	@DeleteMapping("/{authorId}")
+	public ResponseEntity<SuccessMessage<Void>> deleteAuthor(@PathVariable Long authorId){
+		authorService.deleteAuthor(authorId);
+		return new ResponseEntity<>(new SuccessMessage<>("작가삭제성공", null), HttpStatus.OK);
+	}
 }

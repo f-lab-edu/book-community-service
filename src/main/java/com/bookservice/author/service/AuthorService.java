@@ -34,4 +34,10 @@ public class AuthorService {
 		author.update(request.getName());
 	}
 
+	@Transactional
+	public void deleteAuthor(Long authorId) {
+		Author author = authorRepository.findById(authorId).orElseThrow(
+				() -> new BookException(NOT_FOUND_AUTHOR));
+		authorRepository.deleteById(author.getId());
+	}
 }
