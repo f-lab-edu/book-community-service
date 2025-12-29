@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+	ALREADY_EXIST_AUTHORNAME(HttpStatus.BAD_REQUEST, "AUTHOR_002", "이미 존재하는 작가이름입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
