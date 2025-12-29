@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,4 +21,11 @@ public class AuthorController {
 		authorService.registerAuthor(request);
 		return new ResponseEntity<>(new SuccessMessage<>("작가등록성공", null), HttpStatus.CREATED);
 	}
+
+	@PutMapping("/{authorId}")
+	public ResponseEntity<SuccessMessage<Void>> updateAuthor(@PathVariable Long authorId, @Valid @RequestBody AuthorUpdateRequest request){
+		authorService.updateAuthor(authorId, request);
+		return new ResponseEntity<>(new SuccessMessage<>("작가정보수정성공", null), HttpStatus.OK);
+	}
+
 }

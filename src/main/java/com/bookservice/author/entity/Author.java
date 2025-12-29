@@ -29,4 +29,8 @@ public class Author extends TimeStamped {
 	public Author(String name) {
 		this.name = name;
 	}
+
+	public void update(String name) {
+		this.name = name;
+	}
 }
