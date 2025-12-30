@@ -1,11 +1,15 @@
 package com.bookservice.member.service;
 
+import com.bookservice.common.exception.BookException;
 import com.bookservice.member.dto.request.MemberSignUpRequest;
 import com.bookservice.member.entity.Member;
 import com.bookservice.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.bookservice.common.exception.ErrorCode.ALREADY_EXIST_EMAIL;
+import static com.bookservice.common.exception.ErrorCode.ALREADY_EXIST_NICKNAME;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +19,13 @@ public class MemberService {
 
 	@Transactional
 	public void signUp(MemberSignUpRequest request) {
+		if(memberRepository.existsByEmail(request.getEmail())){
+			throw new BookException(ALREADY_EXIST_EMAIL);
+		}
+		if(memberRepository.existsByNickName(request.getNickName())){
+			throw new BookException(ALREADY_EXIST_NICKNAME);
+		}
+
 		Member member = request.toMember(request);
 		memberRepository.save(member);
 	}
