@@ -11,11 +11,11 @@ public class MemberSignUpRequest {
 	private String password;
 	private String nickName;
 
-	public Member toMember(MemberSignUpRequest request) {
+	public Member toMember(String encodePassword) {
 		return Member.builder()
-				.email(request.getEmail())
-				.password(request.getPassword())
-				.nickName(request.getNickName())
+				.email(email)
+				.password(encodePassword)
+				.nickName(nickName)
 				.build();
 	}
 }
