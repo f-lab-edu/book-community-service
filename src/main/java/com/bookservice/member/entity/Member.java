@@ -13,8 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = {
 		@UniqueConstraint(
-				name = "uk_member_email_nickname",
-				columnNames = {"email", "nickname"}
+				name = "uk_email",
+				columnNames = {"email"}
+		),
+		@UniqueConstraint(
+				name = "uk_nick_name",
+				columnNames = {"nick_name"}
 		)
 })
 public class Member extends TimeStamped {
