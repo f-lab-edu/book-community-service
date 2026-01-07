@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(uniqueConstraints = {
 		@UniqueConstraint(
 				name = "uk_hash_tag_name",
-				columnNames = {"hash_tag_name"}
+				columnNames = {"name"}
 		)
 })
 public class HashTag extends TimeStamped {
@@ -24,6 +24,7 @@ public class HashTag extends TimeStamped {
 	private Long id;
 
 	@NotNull
+	@Column(nullable = false)
 	private String name;
 
 	@Builder
