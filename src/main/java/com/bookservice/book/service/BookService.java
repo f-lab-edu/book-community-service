@@ -58,15 +58,19 @@ public class BookService {
 		List<String> requestNames = request.stream().distinct().toList();
 		List<HashTag> tags = hashTagRepository.findAllByNameIn(requestNames);
 
-		if (tags.size() != requestNames.size()) {
-			throw new BookException(NOT_FOUND_HASH_TAG);
-		}
+		validateAllHashTagsExist(tags, requestNames);
 
 		List<BookHashTag> bookHashTags = tags.stream()
 												 .map(tag -> bookMapper.toBookHashTag(book, tag))
 												 .collect(Collectors.toList());
 
 		bookHashTagRepository.saveAll(bookHashTags);
+	}
+
+	private static void validateAllHashTagsExist(List<HashTag> tags, List<String> requestNames) {
+		if (tags.size() != requestNames.size()) {
+			throw new BookException(NOT_FOUND_HASH_TAG);
+		}
 	}
 
 	@Transactional
