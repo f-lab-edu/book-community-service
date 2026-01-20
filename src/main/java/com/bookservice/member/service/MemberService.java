@@ -1,5 +1,8 @@
 package com.bookservice.member.service;
 
+import com.bookservice.common.exception.BookException;
+import com.bookservice.common.exception.ErrorCode;
+import com.bookservice.member.dto.request.MemberLoginRequest;
 import com.bookservice.member.dto.request.MemberSignUpRequest;
 import com.bookservice.member.entity.Member;
 import com.bookservice.member.repository.MemberRepository;
@@ -9,12 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import static com.bookservice.common.exception.ErrorCode.NOT_FOUND_EMAIL;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
+	private final LoginService loginService;
 
 	@Validated
 	@Transactional
@@ -22,5 +28,21 @@ public class MemberService {
 		String encodePassword = passwordEncoder.encode(request.getPassword());
 		Member member = request.toMember(encodePassword);
 		memberRepository.save(member);
+	}
+
+	public void login(MemberLoginRequest request) {
+		Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow(
+				() -> new BookException(NOT_FOUND_EMAIL));
+
+		if(passwordEncoder.matches(request.getPassword(), member.getPassword())){
+			loginService.login(member.getEmail());
+			return;
+		}
+		throw new BookException(ErrorCode.NOT_VALID_PASSWORD);
+
+	}
+
+	public void logout(){
+		loginService.logout();
 	}
 }
