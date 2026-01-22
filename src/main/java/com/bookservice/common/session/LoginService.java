@@ -1,4 +1,4 @@
-package com.bookservice.member.service;
+package com.bookservice.common.session;
 
 public interface LoginService {
 	void login(String email);
