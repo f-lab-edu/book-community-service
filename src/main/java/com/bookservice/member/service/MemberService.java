@@ -2,6 +2,7 @@ package com.bookservice.member.service;
 
 import com.bookservice.common.exception.BookException;
 import com.bookservice.common.exception.ErrorCode;
+import com.bookservice.common.session.LoginService;
 import com.bookservice.member.dto.request.MemberLoginRequest;
 import com.bookservice.member.dto.request.MemberSignUpRequest;
 import com.bookservice.member.entity.Member;

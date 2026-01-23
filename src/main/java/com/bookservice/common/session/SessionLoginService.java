@@ -1,5 +1,7 @@
-package com.bookservice.member.service;
+package com.bookservice.common.session;
 
+import com.bookservice.common.userdetails.UserDetailsImpl;
+import com.bookservice.common.userdetails.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,14 +11,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.List;
 
 @AllArgsConstructor
 @Service
-public class SessionLoginService implements LoginService{
+public class SessionLoginService implements LoginService {
 
 	private static final String USER_ID = "USER_ID";
 	private final HttpSession session;
+	private final UserDetailsServiceImpl userDetailsService;
 
 	@Override
 	public void login(String email) {
@@ -26,7 +28,11 @@ public class SessionLoginService implements LoginService{
 	}
 
 	private void setAuthenticationContext(String email) {
-		Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+		UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(email);
+		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
+				null,
+				Collections.emptyList());
+
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
 		context.setAuthentication(authentication);
 
