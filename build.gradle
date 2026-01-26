@@ -37,8 +37,7 @@ dependencies {
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.redisson:redisson-spring-boot-starter:3.35.0'
-	implementation 'org.redisson:redisson:3.20.0'
+	implementation 'org.springframework.session:spring-session-data-redis'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
