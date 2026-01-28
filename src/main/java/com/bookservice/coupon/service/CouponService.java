@@ -6,7 +6,6 @@ import com.bookservice.coupon.dto.request.CouponUpdateRequest;
 import com.bookservice.coupon.dto.response.CouponListResponse;
 import com.bookservice.coupon.entity.Coupon;
 import com.bookservice.coupon.repository.CouponRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +26,7 @@ public class CouponService {
 	}
 
 	@Transactional
-	public void updateCoupon(Long couponId, @Valid CouponUpdateRequest request) {
+	public void updateCoupon(Long couponId, CouponUpdateRequest request) {
 		Coupon coupon = couponRepository.findById(couponId).orElseThrow(
 				() -> new BookException(NOT_FOUND_COUPON));
 		coupon.update(request.getName(), request.getAmount(), request.getDiscountValue());
@@ -35,9 +34,7 @@ public class CouponService {
 
 	@Transactional
 	public void deleteCoupon(Long couponId) {
-		Coupon coupon = couponRepository.findById(couponId).orElseThrow(
-				() -> new BookException(NOT_FOUND_COUPON));
-		couponRepository.delete(coupon);
+		couponRepository.deleteById(couponId);
 	}
 
 	@Transactional(readOnly = true)
