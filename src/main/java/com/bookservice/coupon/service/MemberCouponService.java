@@ -23,15 +23,13 @@ public class MemberCouponService {
 
 	@Transactional
 	public void registerMemberCoupon(UserDetailsImpl userDetails, Long couponId) {
-		Member member = memberRepository.findByEmail(userDetails.getMember().getEmail()).orElseThrow(
-				() -> new BookException(NOT_FOUND_EMAIL));
 
 		Coupon coupon = couponRepository.findById(couponId).orElseThrow(
 				() -> new BookException(NOT_FOUND_COUPON));
 
-		isAlreadyHasCoupon(couponId, member);
+		isAlreadyHasCoupon(couponId, userDetails.getMember());
 
-		MemberCoupon memberCoupon = MemberCoupon.createMemberCoupon(member, coupon);
+		MemberCoupon memberCoupon = MemberCoupon.createMemberCoupon(userDetails.getMember(), coupon);
 		memberCouponRepository.save(memberCoupon);
 	}
 
