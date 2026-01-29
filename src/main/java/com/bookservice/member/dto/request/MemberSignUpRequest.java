@@ -1,11 +1,13 @@
 package com.bookservice.member.dto.request;
 
 import com.bookservice.member.entity.Member;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class MemberSignUpRequest {
 	private String email;
 	private String password;
