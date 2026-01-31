@@ -39,8 +39,8 @@ public class BookController {
 	}
 
 	@GetMapping("/{bookId}")
-	public ResponseEntity<SuccessMessage<Optional<BookInfo>>> getBookInfo(@PathVariable Long bookId){
-		Optional<BookInfo> bookInfo = bookService.getBookInfo(bookId);
+	public ResponseEntity<SuccessMessage<BookInfo>> getBookInfo(@PathVariable Long bookId){
+		BookInfo bookInfo = bookService.getBookInfo(bookId);
 		return new ResponseEntity<>(new SuccessMessage<>("책조회성공", bookInfo), HttpStatus.OK);
 	}
 }

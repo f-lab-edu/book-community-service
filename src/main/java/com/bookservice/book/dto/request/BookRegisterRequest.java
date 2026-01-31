@@ -2,12 +2,14 @@ package com.bookservice.book.dto.request;
 
 import com.bookservice.author.entity.Author;
 import com.bookservice.book.entity.Book;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class BookRegisterRequest{
 	private String title;
 	private String thumbnail;
