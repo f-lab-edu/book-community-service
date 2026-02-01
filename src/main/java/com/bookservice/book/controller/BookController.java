@@ -2,7 +2,7 @@ package com.bookservice.book.controller;
 
 import com.bookservice.book.dto.request.BookRegisterRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
-import com.bookservice.book.dto.response.BookInfo;
+import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.service.BookService;
 import com.bookservice.common.response.SuccessMessage;
 import jakarta.validation.Valid;
@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,8 +37,8 @@ public class BookController {
 	}
 
 	@GetMapping("/{bookId}")
-	public ResponseEntity<SuccessMessage<BookInfo>> getBookInfo(@PathVariable Long bookId){
-		BookInfo bookInfo = bookService.getBookInfo(bookId);
+	public ResponseEntity<SuccessMessage<BookResponse>> getBookInfo(@PathVariable Long bookId){
+		BookResponse bookInfo = bookService.getBookInfo(bookId);
 		return new ResponseEntity<>(new SuccessMessage<>("책조회성공", bookInfo), HttpStatus.OK);
 	}
 }

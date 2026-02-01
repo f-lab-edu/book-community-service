@@ -4,7 +4,7 @@ import com.bookservice.author.entity.Author;
 import com.bookservice.author.repository.AuthorRepository;
 import com.bookservice.book.dto.request.BookRegisterRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
-import com.bookservice.book.dto.response.BookInfo;
+import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.entity.Book;
 import com.bookservice.book.repository.BookHashTagRepository;
 import com.bookservice.book.repository.BookRepository;
@@ -204,7 +204,7 @@ public class BookServiceTest {
 		given(bookRepository.findByIdWithHashTags(anyLong())).willReturn(Optional.of(existsBook));
 
 		//when
-		BookInfo resultBook = bookService.getBookInfo(compareBookId);
+		BookResponse resultBook = bookService.getBookInfo(compareBookId);
 
 		//then
 		assertThat(resultBook.getTitle()).isEqualTo(existsBook.getTitle());

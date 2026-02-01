@@ -4,7 +4,7 @@ import com.bookservice.author.entity.Author;
 import com.bookservice.author.repository.AuthorRepository;
 import com.bookservice.book.dto.request.BookRegisterRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
-import com.bookservice.book.dto.response.BookInfo;
+import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.entity.Book;
 import com.bookservice.book.repository.BookRepository;
 import com.bookservice.common.exception.BookException;
@@ -74,10 +74,10 @@ public class BookService {
 	}
 
 	@Transactional
-	public BookInfo getBookInfo(Long bookId) {
+	public BookResponse getBookInfo(Long bookId) {
 		bookRepository.updateViews(bookId);
 		return bookRepository.findByIdWithHashTags(bookId)
-					.map(BookInfo::toBook)
+					.map(BookResponse::toBook)
 					.orElseThrow(() -> new BookException(NOT_FOUND_BOOK));
 	}
 }

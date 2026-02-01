@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public class BookInfo {
+public class BookResponse {
 	private final Long bookId;
 	private final String title;
 	private final String thumbnail;
@@ -24,8 +24,8 @@ public class BookInfo {
 	private final String author;
 	private final List<String> bookHashTags;
 
-	public static BookInfo toBook(Book book) {
-		return new BookInfo(
+	public static BookResponse toBook(Book book) {
+		return new BookResponse(
 				book.getId(),
 				book.getTitle(),
 				book.getThumbnail(),
