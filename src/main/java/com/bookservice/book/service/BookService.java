@@ -2,25 +2,19 @@ package com.bookservice.book.service;
 
 import com.bookservice.author.entity.Author;
 import com.bookservice.author.repository.AuthorRepository;
-import com.bookservice.book.dto.request.BookMapper;
 import com.bookservice.book.dto.request.BookRegisterRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
-import com.bookservice.book.dto.response.BookInfo;
+import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.entity.Book;
-import com.bookservice.book.entity.BookHashTag;
-import com.bookservice.book.repository.BookHashTagRepository;
 import com.bookservice.book.repository.BookRepository;
 import com.bookservice.common.exception.BookException;
 import com.bookservice.hashtag.entity.HashTag;
 import com.bookservice.hashtag.repository.HashTagRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.bookservice.common.exception.ErrorCode.*;
 
@@ -30,60 +24,60 @@ public class BookService {
 	private final BookRepository bookRepository;
 	private final AuthorRepository authorRepository;
 	private final HashTagRepository hashTagRepository;
-	private final BookHashTagRepository bookHashTagRepository;
-	private final BookMapper bookMapper;
 
 	@Transactional
-	public void registerBook(@Valid BookRegisterRequest request) {
+	public void registerBook(BookRegisterRequest request) {
 		Author author = authorRepository.findByName(request.getAuthor()).orElseThrow(
 				() -> new BookException(NOT_FOUND_AUTHOR));
-		Book book = request.toBook(author);
-		bookRepository.save(book);
 
-		addHashTags(request.getHashTags(), book);
+		List<HashTag> hashTags = findAllByNameIn(request.getHashTags());
+
+		Book book = request.toBook(author);
+		book.addHashTags(hashTags);
+
+		bookRepository.save(book);
 	}
 
 	@Transactional
-	public void updateBook(Long bookId, @Valid BookUpdateRequest request) {
+	public void updateBook(Long bookId, BookUpdateRequest request) {
 		Book book = bookRepository.findById(bookId).orElseThrow(
 				() -> new BookException(NOT_FOUND_BOOK));
-		book.update(request.getTitle(), request.getThumbnail(), request.getDescription());
 
-		bookHashTagRepository.deleteByBookId(bookId);
+		List<HashTag> tags = findAllByNameIn(request.getHashTags());
 
-		addHashTags(request.getHashTags(), book);
+		book.update(
+				request.getTitle(),
+				request.getThumbnail(),
+				request.getDescription(),
+				tags
+		);
 	}
 
-	private void addHashTags(List<String> request, Book book) {
-		List<String> requestNames = request.stream().distinct().toList();
-		List<HashTag> tags = hashTagRepository.findAllByNameIn(requestNames);
+	private List<HashTag> findAllByNameIn(List<String> request) {
+		List<String> newHashTags = request.stream().distinct().toList();
+		List<HashTag> existsTags = hashTagRepository.findAllByNameIn(newHashTags);
 
-		validateAllHashTagsExist(tags, requestNames);
+		validateAllHashTagsExist(existsTags, newHashTags);
 
-		List<BookHashTag> bookHashTags = tags.stream()
-												 .map(tag -> bookMapper.toBookHashTag(book, tag))
-												 .collect(Collectors.toList());
-
-		bookHashTagRepository.saveAll(bookHashTags);
+		return existsTags;
 	}
 
-	private static void validateAllHashTagsExist(List<HashTag> tags, List<String> requestNames) {
-		if (tags.size() != requestNames.size()) {
+	private static void validateAllHashTagsExist(List<HashTag> existsTags, List<String> newHashTags) {
+		if (existsTags.size() != newHashTags.size()) {
 			throw new BookException(NOT_FOUND_HASH_TAG);
 		}
 	}
 
 	@Transactional
 	public void deleteBook(Long bookId) {
-		Book book = bookRepository.findById(bookId).orElseThrow(
-				() -> new BookException(NOT_FOUND_BOOK));
-		bookRepository.delete(book);
+		bookRepository.deleteById(bookId);
 	}
 
 	@Transactional
-	public Optional<BookInfo> getBookInfo(Long bookId) {
+	public BookResponse getBookInfo(Long bookId) {
 		bookRepository.updateViews(bookId);
 		return bookRepository.findByIdWithHashTags(bookId)
-					.map(BookInfo::toBook);
+					.map(BookResponse::toBook)
+					.orElseThrow(() -> new BookException(NOT_FOUND_BOOK));
 	}
 }

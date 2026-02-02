@@ -2,6 +2,7 @@ package com.bookservice.book.entity;
 
 import com.bookservice.author.entity.Author;
 import com.bookservice.common.time.TimeStamped;
+import com.bookservice.hashtag.entity.HashTag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -76,9 +77,22 @@ public class Book extends TimeStamped {
 		this.author = author;
 	}
 
-	public void update(String title, String thumbnail, String description) {
+	private void addHashTag(HashTag hashTag){
+		BookHashTag bookHashTag = new BookHashTag(this, hashTag);
+		this.bookHashTags.add(bookHashTag);
+	}
+
+	public void addHashTags(List<HashTag> newHashTags){
+		newHashTags.forEach(this::addHashTag);
+	}
+
+	public void update(String title, String thumbnail, String description, List<HashTag> newHashTags) {
 		this.title = title;
 		this.thumbnail = thumbnail;
 		this.description = description;
+
+		this.bookHashTags.clear();
+
+		this.addHashTags(newHashTags);
 	}
 }

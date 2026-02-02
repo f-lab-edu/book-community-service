@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 
+import static com.bookservice.common.exception.ErrorCode.NOT_FOUND_EMAIL;
 import static com.bookservice.common.exception.ErrorCode.NOT_VALID_PASSWORD;
 import static com.bookservice.member.fixture.MemberFixture.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -68,6 +69,19 @@ public class MemberServiceTest {
 
 		//then
 		verify(loginService, times(1)).login(USER_EMAIL);
+	}
+
+	@Test
+	@DisplayName("로그인_실패_이메일_불일치")
+	public void 로그인_실패_이메일_불일치(){
+	    //given
+		MemberLoginRequest request = new MemberLoginRequest("other_user_email", PASSWORD);
+
+		given(memberRepository.findByEmail(request.getEmail())).willReturn(Optional.empty());
+		//when
+		assertThatThrownBy(() -> memberService.login(request))
+				.isInstanceOf(BookException.class)
+				.hasFieldOrPropertyWithValue("errorCode", NOT_FOUND_EMAIL);
 	}
 
 	@Test

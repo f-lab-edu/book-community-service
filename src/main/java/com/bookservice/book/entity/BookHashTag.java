@@ -26,8 +26,7 @@ public class BookHashTag extends TimeStamped {
 	private HashTag hashTag;
 
 	@Builder
-	public BookHashTag(Long id, Book book, HashTag hashTag) {
-		this.id = id;
+	public BookHashTag(Book book, HashTag hashTag) {
 		this.book = book;
 		this.hashTag = hashTag;
 	}
