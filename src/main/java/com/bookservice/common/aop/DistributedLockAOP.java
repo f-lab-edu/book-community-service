@@ -38,7 +38,7 @@ public class DistributedLockAOP {
 
 		try {
 			boolean available = lock.tryLock(distributedLock.timeWait(), distributedLock.leaseTime(), distributedLock.timeUnit());
-			if(! available){
+			if(!available){
 				throw new RuntimeException("락 획득에 실패 하였습니다.");
 			}
 			return aopForTransaction.proceed(joinPoint);
