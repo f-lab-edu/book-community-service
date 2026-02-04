@@ -10,9 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import static com.bookservice.coupon.entity.enums.CouponStatus.AVAILABLE;
+import static com.bookservice.coupon.entity.enums.CouponStatus.USED;
 
 @Entity
 @Getter
@@ -31,12 +31,14 @@ public class MemberCoupon extends TimeStamped {
 	@JoinColumn(name="coupon_id")
 	private Coupon coupon;
 
+	@Enumerated(EnumType.STRING)
 	private CouponStatus status;
+
 	private LocalDateTime issuedAt;	//발급일
-	private Date usedAt;	//사용일
+	private LocalDateTime usedAt;	//사용일
 
 	@Builder
-	public MemberCoupon(Member member, Coupon coupon, CouponStatus status) {
+	public MemberCoupon(Member member, Coupon coupon) {
 		this.member = member;
 		this.coupon = coupon;
 		this.status = AVAILABLE;
@@ -48,5 +50,10 @@ public class MemberCoupon extends TimeStamped {
 					   .member(member)
 					   .coupon(coupon)
 					   .build();
+	}
+
+	public void use() {
+		this.status = USED;
+		this.usedAt = LocalDateTime.now();
 	}
 }
