@@ -24,7 +24,9 @@ public enum ErrorCode {
 
 	NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "REVIEW_001", "찾을 수 없는 리뷰입니다."),
 
-	NOT_FOUND_COUPON(HttpStatus.NOT_FOUND, "COUPON_001", "찾을 수 없는 쿠폰입니다.");
+	NOT_FOUND_COUPON(HttpStatus.NOT_FOUND, "COUPON_001", "찾을 수 없는 쿠폰입니다."),
+	NO_AVAILABLE_COUPONS(HttpStatus.BAD_REQUEST, "COUPON_002", "사용 할 수 있는 쿠폰이 없습니다."),
+	CANT_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "COUPON_003", "쿠폰이 모두 소진됐습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
