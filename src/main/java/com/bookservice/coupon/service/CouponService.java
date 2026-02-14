@@ -1,9 +1,11 @@
 package com.bookservice.coupon.service;
 
 import com.bookservice.common.exception.BookException;
+import com.bookservice.common.userdetails.UserDetailsImpl;
 import com.bookservice.coupon.dto.request.CouponRegisterRequest;
 import com.bookservice.coupon.dto.request.CouponUpdateRequest;
 import com.bookservice.coupon.dto.response.CouponListResponse;
+import com.bookservice.coupon.dto.response.UsableCouponResponse;
 import com.bookservice.coupon.entity.Coupon;
 import com.bookservice.coupon.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +43,10 @@ public class CouponService {
 	public CouponListResponse getAllCoupons() {
 		List<Coupon> coupons = couponRepository.findAll();
 		return CouponListResponse.toResponse(coupons);
+	}
+
+	@Transactional(readOnly = true)
+	public List<UsableCouponResponse> getUsableCoupons(UserDetailsImpl userDetails) {
+		return couponRepository.getUsableCoupons(userDetails.getMember().getId());
 	}
 }

@@ -3,5 +3,5 @@ package com.bookservice.coupon.repository;
 import com.bookservice.coupon.entity.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CouponRepository extends JpaRepository<Coupon, Long> {
+public interface CouponRepository extends JpaRepository<Coupon, Long>, CouponRepositoryCustom {
 }
