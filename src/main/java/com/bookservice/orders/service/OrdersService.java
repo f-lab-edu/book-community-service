@@ -60,13 +60,13 @@ public class OrdersService {
 	}
 
 	private Long findCanUseCouponAtMemberId(Long couponId, Member member, Long discountAmount) {
-		if(couponId != null){
-			MemberCoupon memberCoupon = memberCouponRepository.findByMemberIdAndCouponId(member.getId(), couponId);
-			memberCoupon.use();
-			Coupon coupon = memberCoupon.getCoupon();
-
-			discountAmount = coupon.getDiscountValue();
+		if(couponId == null){
+			return discountAmount;
 		}
-		return discountAmount;
+
+		MemberCoupon memberCoupon = memberCouponRepository.findByMemberIdAndCouponId(member.getId(), couponId);
+		memberCoupon.use();
+
+		return memberCoupon.getCoupon().getDiscountValue();
 	}
 }
