@@ -3,7 +3,6 @@ package com.bookservice.orders.service;
 import com.bookservice.book.entity.Book;
 import com.bookservice.book.repository.BookRepository;
 import com.bookservice.common.exception.BookException;
-import com.bookservice.orders.repository.OrderedBookMapper;
 import com.bookservice.common.userdetails.UserDetailsImpl;
 import com.bookservice.coupon.entity.Coupon;
 import com.bookservice.coupon.entity.MemberCoupon;
@@ -12,12 +11,14 @@ import com.bookservice.member.entity.Member;
 import com.bookservice.orders.domain.Orders;
 import com.bookservice.orders.domain.Payment;
 import com.bookservice.orders.dto.request.OrdersRegisterRequest;
+import com.bookservice.orders.repository.OrderedBookRepository;
 import com.bookservice.orders.repository.OrdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bookservice.common.exception.ErrorCode.*;
+import static com.bookservice.common.exception.ErrorCode.ALREADY_OWNED_BOOK;
+import static com.bookservice.common.exception.ErrorCode.NOT_FOUND_BOOK;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class OrdersService {
 	private final BookRepository bookRepository;
 	private final OrdersRepository ordersRepository;
 	private final MemberCouponRepository memberCouponRepository;
-	private final OrderedBookMapper orderedBookMapper;
+	private final OrderedBookRepository orderedBookRepository;
 
 	//분산락을 이용한 동시성 처리 필요. -> 서버를 여러개 쓸거라서
 	@Transactional
@@ -35,7 +36,7 @@ public class OrdersService {
 		Member member = userDetails.getMember();
 		Long discountAmount = 0L;
 
-		if(orderedBookMapper.existsOrderedBook(bookId, member.getId())){
+		if(orderedBookRepository.existsOrderedBook(bookId, member.getId())){
 			throw new BookException(ALREADY_OWNED_BOOK);
 		}
 

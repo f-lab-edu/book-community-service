@@ -3,7 +3,6 @@ package com.bookservice.order;
 import com.bookservice.book.entity.Book;
 import com.bookservice.book.repository.BookRepository;
 import com.bookservice.common.exception.BookException;
-import com.bookservice.orders.repository.OrderedBookMapper;
 import com.bookservice.common.userdetails.UserDetailsImpl;
 import com.bookservice.coupon.entity.Coupon;
 import com.bookservice.coupon.entity.MemberCoupon;
@@ -12,6 +11,7 @@ import com.bookservice.member.entity.Member;
 import com.bookservice.member.fixture.MemberFixture;
 import com.bookservice.orders.domain.Orders;
 import com.bookservice.orders.dto.request.OrdersRegisterRequest;
+import com.bookservice.orders.repository.OrderedBookRepository;
 import com.bookservice.orders.repository.OrdersRepository;
 import com.bookservice.orders.service.OrdersService;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +25,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.bookservice.book.fixture.BookFixture.*;
-import static com.bookservice.common.exception.ErrorCode.*;
+import static com.bookservice.common.exception.ErrorCode.ALREADY_OWNED_BOOK;
+import static com.bookservice.common.exception.ErrorCode.NOT_FOUND_BOOK;
 import static com.bookservice.member.fixture.MemberFixture.*;
 import static com.bookservice.orders.domain.enums.PaymentType.CASH;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,7 +40,7 @@ public class OrderServiceTest {
 	@InjectMocks
 	private OrdersService ordersService;
 	@Mock
-	private OrderedBookMapper orderedBookMapper;
+	private OrderedBookRepository orderedBookRepository;
 	@Mock
 	private BookRepository bookRepository;
 	@Mock
@@ -71,7 +72,7 @@ public class OrderServiceTest {
 
 		OrdersRegisterRequest request = new OrdersRegisterRequest(1L, LocalDateTime.now(), 2000L, CASH);
 
-		given(orderedBookMapper.existsOrderedBook(bookId, member.getId())).willReturn(false);
+		given(orderedBookRepository.existsOrderedBook(bookId, member.getId())).willReturn(false);
 		given(bookRepository.findById(bookId)).willReturn(Optional.of(book));
 		given(memberCouponRepository.findByMemberIdAndCouponId(member.getId(), couponId)).willReturn(memberCoupon);
 
@@ -92,7 +93,7 @@ public class OrderServiceTest {
 		UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
 		OrdersRegisterRequest request = new OrdersRegisterRequest(1L, LocalDateTime.now(), 2000L, CASH);
 
-		given(orderedBookMapper.existsOrderedBook(bookId, member.getId())).willReturn(true);
+		given(orderedBookRepository.existsOrderedBook(bookId, member.getId())).willReturn(true);
 
 		//when&then
 		assertThatThrownBy(() -> ordersService.purchaseBook(userDetails, request, bookId))
@@ -109,7 +110,7 @@ public class OrderServiceTest {
 		UserDetailsImpl userDetails = new UserDetailsImpl(member, member.getEmail());
 		OrdersRegisterRequest request = new OrdersRegisterRequest(1L, LocalDateTime.now(), 2000L, CASH);
 
-		given(orderedBookMapper.existsOrderedBook(bookId, member.getId())).willReturn(false);
+		given(orderedBookRepository.existsOrderedBook(bookId, member.getId())).willReturn(false);
 		given(bookRepository.findById(bookId)).willReturn(Optional.empty());
 
 		//when & then
