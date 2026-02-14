@@ -16,6 +16,8 @@ public enum ErrorCode {
 
 	NOT_FOUND_BOOK(HttpStatus.NOT_FOUND, "BOOK_001", "찾을 수 없는 책입니다."),
 
+	ALREADY_OWNED_BOOK(HttpStatus.NOT_FOUND, "ORDERED_BOOK_001", "이미 구매한 책입니다."),
+
 	NOT_FOUND_AUTHOR(HttpStatus.NOT_FOUND, "AUTHOR_001", "찾을 수 없는 작가입니다."),
 	ALREADY_EXIST_AUTHORNAME(HttpStatus.BAD_REQUEST, "AUTHOR_002", "이미 존재하는 작가이름입니다."),
 
