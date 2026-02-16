@@ -1,15 +1,20 @@
 package com.bookservice.coupon.controller;
 
 import com.bookservice.common.response.SuccessMessage;
+import com.bookservice.common.userdetails.UserDetailsImpl;
 import com.bookservice.coupon.dto.request.CouponRegisterRequest;
 import com.bookservice.coupon.dto.request.CouponUpdateRequest;
 import com.bookservice.coupon.dto.response.CouponListResponse;
+import com.bookservice.coupon.dto.response.UsableCouponResponse;
 import com.bookservice.coupon.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,5 +44,11 @@ public class CouponController {
 	public ResponseEntity<SuccessMessage<CouponListResponse>> getAllCoupons(){
 		CouponListResponse response = couponService.getAllCoupons();
 		return new ResponseEntity<>(new SuccessMessage<>("모든쿠폰조회성공", response), HttpStatus.OK);
+	}
+
+	@GetMapping("/{memberId}/coupon")
+	public ResponseEntity<SuccessMessage<List<UsableCouponResponse>>> getUsableCoupons(@AuthenticationPrincipal UserDetailsImpl userDetails){
+		List<UsableCouponResponse> response = couponService.getUsableCoupons(userDetails);
+		return new ResponseEntity<>(new SuccessMessage<>("사용가능한쿠폰조회성공", response), HttpStatus.OK);
 	}
 }
