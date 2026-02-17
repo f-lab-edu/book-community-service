@@ -1,6 +1,7 @@
 package com.bookservice.book.controller;
 
 import com.bookservice.book.dto.request.BookRegisterRequest;
+import com.bookservice.book.dto.request.BookSearchRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
 import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.service.BookService;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/book")
@@ -18,7 +21,7 @@ public class BookController {
 
 	private final BookService bookService;
 
-	@PostMapping
+	@PostMapping("/book")
 	public ResponseEntity<SuccessMessage<Void>> registerBook(@Valid @RequestBody BookRegisterRequest request){
 		bookService.registerBook(request);
 		return new ResponseEntity<>(new SuccessMessage<>("책등록성공", null), HttpStatus.CREATED);
@@ -40,5 +43,21 @@ public class BookController {
 	public ResponseEntity<SuccessMessage<BookResponse>> getBookInfo(@PathVariable Long bookId){
 		BookResponse bookInfo = bookService.getBookInfo(bookId);
 		return new ResponseEntity<>(new SuccessMessage<>("책조회성공", bookInfo), HttpStatus.OK);
+	}
+
+	@GetMapping("/allBooks")
+	public ResponseEntity<SuccessMessage<List<BookResponse>>> getBookListResponse(
+			@RequestBody BookSearchRequest searchRequest,
+			@RequestParam(defaultValue = "1") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize){
+		List<BookResponse> bookList = bookService.getBookListResponse(searchRequest, pageNo, pageSize);
+		return new ResponseEntity<>(new SuccessMessage<>("모든책조회성공", bookList), HttpStatus.OK);
+	}
+
+	@GetMapping("/bestSellers")
+	public ResponseEntity<SuccessMessage<List<BookResponse>>> getBestSellersResponse(@RequestParam(defaultValue = "1") int pageNo,
+																				   @RequestParam(defaultValue = "10") int pageSize){
+		List<BookResponse> bookList = bookService.getBestSellersResponse(pageNo, pageSize);
+		return new ResponseEntity<>(new SuccessMessage<>("실시간베스트셀러조회성공", bookList), HttpStatus.OK);
 	}
 }
