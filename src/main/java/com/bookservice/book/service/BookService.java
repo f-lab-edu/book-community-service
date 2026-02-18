@@ -3,6 +3,7 @@ package com.bookservice.book.service;
 import com.bookservice.author.entity.Author;
 import com.bookservice.author.repository.AuthorRepository;
 import com.bookservice.book.dto.request.BookRegisterRequest;
+import com.bookservice.book.dto.request.BookSearchRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
 import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.entity.Book;
@@ -11,6 +12,9 @@ import com.bookservice.common.exception.BookException;
 import com.bookservice.hashtag.entity.HashTag;
 import com.bookservice.hashtag.repository.HashTagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,10 @@ public class BookService {
 	private final HashTagRepository hashTagRepository;
 
 	@Transactional
+	@CacheEvict(
+			value = "weeklyBestSellers",
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize"
+	)
 	public void registerBook(BookRegisterRequest request) {
 		Author author = authorRepository.findByName(request.getAuthor()).orElseThrow(
 				() -> new BookException(NOT_FOUND_AUTHOR));
@@ -39,6 +47,10 @@ public class BookService {
 	}
 
 	@Transactional
+	@CacheEvict(
+			value = "weeklyBestSellers",
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize"
+	)
 	public void updateBook(Long bookId, BookUpdateRequest request) {
 		Book book = bookRepository.findById(bookId).orElseThrow(
 				() -> new BookException(NOT_FOUND_BOOK));
@@ -69,15 +81,37 @@ public class BookService {
 	}
 
 	@Transactional
+	@CacheEvict(
+			value = "weeklyBestSellers",
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize"
+	)
 	public void deleteBook(Long bookId) {
 		bookRepository.deleteById(bookId);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public BookResponse getBookInfo(Long bookId) {
 		bookRepository.updateViews(bookId);
 		return bookRepository.findByIdWithHashTags(bookId)
 					.map(BookResponse::toBook)
 					.orElseThrow(() -> new BookException(NOT_FOUND_BOOK));
+	}
+
+	@Transactional(readOnly = true)
+	public List<BookResponse> getBookListResponse(BookSearchRequest searchRequest, Integer pageNo, Integer pageSize) {
+		//db에서는 0이 1이다.
+		PageRequest pageable = PageRequest.of(pageNo - 1, pageSize);
+		return bookRepository.findBookListResponse(searchRequest, pageable);
+	}
+
+	@Transactional(readOnly = true)
+	@Cacheable(
+			value = "weeklyBestSellers",
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize",
+			cacheManager = "cacheManager"
+	)
+	public List<BookResponse> getBestSellersResponse(int pageNo, int pageSize) {
+		PageRequest pageable = PageRequest.of(pageNo - 1, pageSize);
+		return bookRepository.getBestSellersResponse(pageable);
 	}
 }
