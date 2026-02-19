@@ -32,7 +32,7 @@ public class BookService {
 	@Transactional
 	@CacheEvict(
 			value = "weeklyBestSellers",
-			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize"
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now()"
 	)
 	public void registerBook(BookRegisterRequest request) {
 		Author author = authorRepository.findByName(request.getAuthor()).orElseThrow(
@@ -49,7 +49,7 @@ public class BookService {
 	@Transactional
 	@CacheEvict(
 			value = "weeklyBestSellers",
-			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize"
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now()"
 	)
 	public void updateBook(Long bookId, BookUpdateRequest request) {
 		Book book = bookRepository.findById(bookId).orElseThrow(
@@ -83,7 +83,7 @@ public class BookService {
 	@Transactional
 	@CacheEvict(
 			value = "weeklyBestSellers",
-			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize"
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now()"
 	)
 	public void deleteBook(Long bookId) {
 		bookRepository.deleteById(bookId);
