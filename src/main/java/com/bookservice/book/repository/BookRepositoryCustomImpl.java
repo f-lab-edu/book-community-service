@@ -7,7 +7,7 @@ import com.bookservice.book.entity.Book;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -48,7 +48,7 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 	}
 
 	@Override
-	public List<BookResponse> findBookListResponse(BookSearchRequest searchRequest, PageRequest pageable) {
+	public List<BookResponse> findBookListResponse(BookSearchRequest searchRequest, Pageable pageable) {
 		List<Long> bookIds = queryFactory
 									 .select(book.id)
 									 .from(book)
@@ -86,7 +86,7 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 	}
 
 	@Override
-	public List<BookResponse> getBestSellersResponse(PageRequest pageable) {
+	public List<BookResponse> getBestSellersResponse(Pageable pageable) {
 		LocalDateTime oneWeekAgo = LocalDateTime.now().minusDays(7);
 
 		List<Long> bookIds = queryFactory

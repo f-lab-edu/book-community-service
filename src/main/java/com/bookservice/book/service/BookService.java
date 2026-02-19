@@ -14,7 +14,7 @@ import com.bookservice.hashtag.repository.HashTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,20 +98,17 @@ public class BookService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<BookResponse> getBookListResponse(BookSearchRequest searchRequest, Integer pageNo, Integer pageSize) {
-		//db에서는 0이 1이다.
-		PageRequest pageable = PageRequest.of(pageNo - 1, pageSize);
+	public List<BookResponse> getBookListResponse(BookSearchRequest searchRequest, Pageable pageable) {
 		return bookRepository.findBookListResponse(searchRequest, pageable);
 	}
 
 	@Transactional(readOnly = true)
 	@Cacheable(
 			value = "weeklyBestSellers",
-			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now() + ':page:' + #pageNo + ':size:' + #pageSize",
+			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now()",
 			cacheManager = "cacheManager"
 	)
-	public List<BookResponse> getBestSellersResponse(int pageNo, int pageSize) {
-		PageRequest pageable = PageRequest.of(pageNo - 1, pageSize);
+	public List<BookResponse> getBestSellersResponse(Pageable pageable) {
 		return bookRepository.getBestSellersResponse(pageable);
 	}
 }
