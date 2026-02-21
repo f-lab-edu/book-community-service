@@ -105,7 +105,7 @@ public class BookService {
 	@Transactional(readOnly = true)
 	@Cacheable(
 			value = "weeklyBestSellers",
-			key = "T(java.time.LocalDate).now().minusDays(7) + ' ~ ' + T(java.time.LocalDate).now()",
+			key = "T(java.time.LocalDate).now().minusDays(7) + '~' + T(java.time.LocalDate).now() + ':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize",
 			cacheManager = "cacheManager"
 	)
 	public List<BookResponse> getBestSellersResponse(Pageable pageable) {
