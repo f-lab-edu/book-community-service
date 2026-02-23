@@ -1,6 +1,9 @@
 # book-community-service
 책에 대한 정보를 공유하고 소통하는 커뮤니티 서비스입니다.
 
+## 🖥️ book-community-service 프로젝트 진행 과정
+https://pungdange.tistory.com/
+
 ## 🖥️ book-community-service 아키텍처 구조도
 <img width="1567" height="1999" alt="untitled (1)" src="https://github.com/user-attachments/assets/24f64d21-726f-49d8-b6e1-48d2bc5581d2" />
 
