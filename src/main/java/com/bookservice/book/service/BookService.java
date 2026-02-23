@@ -8,10 +8,12 @@ import com.bookservice.book.dto.request.BookUpdateRequest;
 import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.entity.Book;
 import com.bookservice.book.repository.BookRepository;
+import com.bookservice.common.aop.DistributedCacheable;
 import com.bookservice.common.exception.BookException;
 import com.bookservice.hashtag.entity.HashTag;
 import com.bookservice.hashtag.repository.HashTagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ public class BookService {
 	private final BookRepository bookRepository;
 	private final AuthorRepository authorRepository;
 	private final HashTagRepository hashTagRepository;
+	private final CacheManager cacheManager;
 
 	@Transactional
 	@CacheEvict(
@@ -107,6 +110,10 @@ public class BookService {
 			value = "weeklyBestSellers",
 			key = "T(java.time.LocalDate).now().minusDays(7) + '~' + T(java.time.LocalDate).now() + ':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize",
 			cacheManager = "cacheManager"
+	)
+	@DistributedCacheable(
+			cacheName = "weeklyBestSellers",
+			key = "':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize"
 	)
 	public List<BookResponse> getBestSellersResponse(Pageable pageable) {
 		return bookRepository.getBestSellersResponse(pageable);
