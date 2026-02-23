@@ -3,6 +3,7 @@ package com.bookservice.book.service;
 import com.bookservice.author.entity.Author;
 import com.bookservice.author.repository.AuthorRepository;
 import com.bookservice.book.dto.request.BookRegisterRequest;
+import com.bookservice.book.dto.request.BookSearchRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
 import com.bookservice.book.dto.response.BookResponse;
 import com.bookservice.book.entity.Book;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,8 +47,8 @@ public class BookServiceTest {
 	private BookHashTagRepository bookHashTagRepository;
 	
 	@Test
-	@DisplayName("책_생성_성공_모든_정보_정상")
-	public void 책_생성_성공_모든_정보_정상(){
+	@DisplayName("도서_생성_성공_모든_정보_정상")
+	public void 도서_생성_성공_모든_정보_정상(){
 	    //given
 		List<String> hashTagNames = List.of(HASH_01, HASH_02);
 		List<HashTag> hashTags = List.of(
@@ -66,8 +69,8 @@ public class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("책_등록_실패_작가_이름_없음")
-	public void 책_등록_실패_작가_이름_없음(){
+	@DisplayName("도서_등록_실패_작가_이름_없음")
+	public void 도서_등록_실패_작가_이름_없음(){
 		//given
 		List<String> hashTagNames = List.of(HASH_01, HASH_02);
 		BookRegisterRequest request = new BookRegisterRequest(TITLE, THUMBNAIL, DESCRIPTION, RELEASE_DATE, AUTHOR, hashTagNames);
@@ -82,8 +85,8 @@ public class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("책_등록_실패_등록된_해시태그_없음")
-	public void 책_등록_실패_등록된_해시태그_없음(){
+	@DisplayName("도서_등록_실패_등록된_해시태그_없음")
+	public void 도서_등록_실패_등록된_해시태그_없음(){
 		//given
 		Author author = new Author(AUTHOR);
 		List<String> hashTagNames = List.of(HASH_01, HASH_02);
@@ -100,8 +103,8 @@ public class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("책_등록_실패_제목_없음")
-	public void 책_등록_실패_제목_없음(){
+	@DisplayName("도서_등록_실패_제목_없음")
+	public void 도서_등록_실패_제목_없음(){
 		//given
 		List<String> hashTagNames = List.of(HASH_01, HASH_02);
 		BookRegisterRequest request = new BookRegisterRequest(null, THUMBNAIL, DESCRIPTION, RELEASE_DATE, AUTHOR, hashTagNames);
@@ -112,8 +115,8 @@ public class BookServiceTest {
 	}
 	
 	@Test
-	@DisplayName("책_수정_성공")
-	public void 책_수정_성공(){
+	@DisplayName("도서_수정_성공")
+	public void 도서_수정_성공(){
 	    //given
 		Long bookId = 1L;
 		List<String> newTagNames = List.of("코미디", "로맨스");
@@ -142,8 +145,8 @@ public class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("책_수정_실패_아이디_없음")
-	public void 책_수정_실패_아이디_없음(){
+	@DisplayName("도서_수정_실패_아이디_없음")
+	public void 도서_수정_실패_아이디_없음(){
 	    //given
 		Long compareBookId = 9999L;
 		List<String> newTagNames = List.of("코미디", "로맨스");
@@ -165,8 +168,8 @@ public class BookServiceTest {
 	}
 	
 	@Test
-	@DisplayName("책_수정_실패_등록되지_않은_해시태그")
-	public void 책_수정_실패_등록되지_않은_해시태그(){
+	@DisplayName("도서_수정_실패_등록되지_않은_해시태그")
+	public void 도서_수정_실패_등록되지_않은_해시태그(){
 	    //given
 		Long compareBookId = 1L;
 		Book existsBook = toExistsBook(TITLE, THUMBNAIL, DESCRIPTION);
@@ -187,15 +190,15 @@ public class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("책_삭제_완료")
-	public void 책_삭제_성공(){
+	@DisplayName("도서_삭제_완료")
+	public void 도서_삭제_성공(){
 		//given & when & then
 		bookService.deleteBook(anyLong());
 	}
 
 	@Test
-	@DisplayName("책_조회_완료")
-	public void 책_단일_조회_완료(){
+	@DisplayName("도서_조회_완료")
+	public void 도서_단일_조회_완료(){
 	    //given
 		Long compareBookId = 1L;
 		Author author = new Author(AUTHOR);
@@ -214,8 +217,8 @@ public class BookServiceTest {
 	}
 
 	@Test
-	@DisplayName("책_조회_실패_아이디_없음")
-	public void 책_조회_실패_아이디_없음(){
+	@DisplayName("도서_조회_실패_아이디_없음")
+	public void 도서_조회_실패_아이디_없음(){
 	    //given
 		Long compareBookId = 1L;
 
@@ -226,5 +229,99 @@ public class BookServiceTest {
 		assertThatThrownBy(() -> bookService.getBookInfo(compareBookId))
 				.isInstanceOf(BookException.class)
 				.hasFieldOrPropertyWithValue("errorCode", NOT_FOUND_BOOK);
+	}
+
+	@Test
+	@DisplayName("도서_조회_성공")
+	public void 도서_조회_성공(){
+	    //given
+		Pageable pageable = PageRequest.of(0,10);
+		BookSearchRequest searchTitle = new BookSearchRequest("searchTitle", 0, 1000);
+
+		BookResponse book1 = BookResponse.builder()
+									 .bookId(1L)
+									 .title("book1Title")
+									 .thumbnail(THUMBNAIL)
+									 .build();
+
+		BookResponse book2 = BookResponse.builder()
+									 .bookId(2L)
+									 .title("book2Title")
+									 .thumbnail(THUMBNAIL)
+									 .build();
+
+		List<BookResponse> expectedList = List.of(book1, book2);
+
+		given(bookRepository.findBookListResponse(any(BookSearchRequest.class), any(Pageable.class))).willReturn(expectedList);
+	    //when
+		List<BookResponse> listResponse = bookRepository.findBookListResponse(searchTitle, pageable);
+
+		//then
+		assertThat(listResponse).isNotNull();
+		assertThat(listResponse).hasSize(2);
+
+		assertThat(listResponse.get(0).getTitle()).isEqualTo("book1Title");
+		assertThat(listResponse.get(1).getTitle()).isEqualTo("book2Title");
+
+		verify(bookRepository, times(1)).findBookListResponse(searchTitle, pageable);
+	}
+
+	@Test
+	@DisplayName("도서_조회_성공_null_조회")
+	public void 도서_조회_성공_null_조회(){
+	    //given
+		Pageable pageable = PageRequest.of(0,10);
+		BookSearchRequest searchTitle = new BookSearchRequest("title", 0, 1000);
+
+		given(bookRepository.findBookListResponse(any(), any())).willReturn(List.of());
+
+	    //when
+
+		List<BookResponse> listResponse = bookRepository.findBookListResponse(searchTitle, pageable);
+
+		//then
+		assertThat(listResponse).isNotNull();
+		assertThat(listResponse).hasSize(0);
+
+		verify(bookRepository, times(1)).findBookListResponse(searchTitle, pageable);
+	}
+
+	@Test
+	@DisplayName("도서_베스트셀러_조회_성공")
+	public void 도서_베스트셀러_조회_성공(){
+	    //given
+		Pageable pageable = PageRequest.of(0,10);
+
+		BookResponse book1 = BookResponse.builder()
+									 .bookId(1L)
+									 .title("book1Title")
+									 .viewCount(50)
+									 .interestedCount(50)
+									 .releaseDate("2026-02-19")
+									 .build();
+
+		BookResponse book2 = BookResponse.builder()
+									 .bookId(2L)
+									 .title("book2Title")
+									 .viewCount(100)
+									 .interestedCount(100)
+									 .releaseDate("2026-02-19")
+									 .build();
+
+		List<BookResponse> expectedList = List.of(book2, book1);
+
+		given(bookRepository.getBestSellersResponse(any(Pageable.class))).willReturn(expectedList);
+
+		//when
+		List<BookResponse> result = bookRepository.getBestSellersResponse(pageable);
+
+		//then
+		assertThat(result).isNotNull();
+		assertThat(result).hasSize(2);
+
+		assertThat(result.get(0).getTitle()).isEqualTo("book2Title");
+		assertThat(result.get(1).getTitle()).isEqualTo("book1Title");
+
+		verify(bookRepository, times(1)).getBestSellersResponse(pageable);
 	}
 }

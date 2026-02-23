@@ -2,7 +2,7 @@
 책에 대한 정보를 공유하고 소통하는 커뮤니티 서비스입니다.
 
 ## 🖥️ book-community-service 아키텍처 구조도
-<img width="563" height="591" alt="제목 없는 다이어그램-페이지-1 drawio (1)" src="https://github.com/user-attachments/assets/82673652-ced5-4c4e-8452-b2450b958f70" />
+<img width="1567" height="1999" alt="untitled (1)" src="https://github.com/user-attachments/assets/24f64d21-726f-49d8-b6e1-48d2bc5581d2" />
 
 ## 🕸️ 프로젝트 erd
 <img width="2000" height="2000" alt="unnamed-2025-12-29T23_47_51" src="https://github.com/user-attachments/assets/57ea47b7-0a8c-491d-8b8f-a53921d4b719" />
