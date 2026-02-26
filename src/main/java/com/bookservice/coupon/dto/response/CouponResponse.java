@@ -9,10 +9,10 @@ public class CouponResponse {
 	private final Long couponId;
 	private final String name;
 	private final Integer amount;
-	private final Integer discountValue;
+	private final Long discountValue;
 
 	@Builder
-	public CouponResponse(Long couponId, String name, Integer amount, Integer discountValue) {
+	public CouponResponse(Long couponId, String name, Integer amount, Long discountValue) {
 		this.couponId = couponId;
 		this.name = name;
 		this.amount = amount;

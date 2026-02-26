@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.bookservice.book.entity.QBook.book;
 import static com.bookservice.coupon.entity.QCoupon.coupon;
 import static com.bookservice.coupon.entity.QMemberCoupon.memberCoupon;
 

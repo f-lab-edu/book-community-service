@@ -6,5 +6,5 @@ import lombok.Getter;
 public class CouponUpdateRequest {
 	private String name;
 	private Integer amount;
-	private Integer discountValue;
+	private Long discountValue;
 }

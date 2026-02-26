@@ -7,7 +7,7 @@ import lombok.Getter;
 public class CouponRegisterRequest {
 	private String name;
 	private Integer amount;
-	private Integer discountValue;
+	private Long discountValue;
 
 	public Coupon toCoupon() {
 		return Coupon.builder()
