@@ -7,7 +7,7 @@ on:
 
 jobs:
   Deploy:
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
 
     steps:
       - name: 1. 레포지토리 코드 가져오기
