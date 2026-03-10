@@ -128,4 +128,3 @@ jobs:
           
           # 작성된 파이썬 스크립트 실행
           python script.py
-          ```
