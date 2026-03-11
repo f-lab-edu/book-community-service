@@ -1,0 +1,130 @@
+name: create-pr
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+
+env:
+  TARGET_BRANCH: develop
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. 레포지토리 코드 가져오기
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 2. 파이썬 환경 세팅
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 3. 필수 라이브러리 설치
+        run: pip install google-genai
+
+      - name: 4. Gemini API 호출 및 PR 자동 생성/업데이트 (Python)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin ${{ env.TARGET_BRANCH }}
+          
+          cat << 'EOF' > script.py
+          import os, json, subprocess, sys
+          from google import genai
+          
+          target_branch = os.environ.get('TARGET_BRANCH')
+          current_branch = os.environ.get('GITHUB_REF_NAME')
+          
+          api_key = os.environ.get('GEMINI_API_KEY', '').strip()
+          
+          client = genai.Client(api_key=api_key) 
+          
+          # 1) Diff(변경 사항) 추출
+          diff_cmd = f'git diff origin/{target_branch}...HEAD'
+          result = subprocess.run(diff_cmd.split(), capture_output=True, text=True)
+          diff_text = result.stdout
+          
+          if not diff_text.strip():
+              print('변경 사항이 없어 PR을 생성하지 않습니다.')
+              sys.exit(0)
+          
+          if len(diff_text) > 15000:
+              diff_text = diff_text[:15000] + '\n...[생략]...'
+          
+          # 2) 제미나이 프롬프트 세팅
+          prompt = f'''
+          당신은 시니어 백엔드 개발자입니다. 아래의 코드 변경 사항(git diff)을 분석해서, 
+          동료들이 이해하기 쉽도록 Pull Request의 제목과 본문을 작성해주세요.
+          
+          반드시 아래의 JSON 형식으로만 답변해주세요. 마크다운 코드블록(```json)은 빼고 순수 JSON 텍스트만 출력하세요.
+          {{
+              "title": "[FEAT] 적절한 PR 제목",
+              "body": "마크다운 형식의 본문"
+          }}
+          
+          코드 변경 사항:
+          {diff_text}
+          '''
+          
+          # 3) 제미나이 API 호출
+          try:
+              response = client.models.generate_content(
+                  model='gemini-2.5-flash', 
+                  contents=prompt
+              )
+          
+              response_text = response.text.replace('```json', '').replace('```', '').strip()
+          
+              pr_data = json.loads(response_text)
+              pr_title = pr_data['title']
+              pr_body = pr_data['body'] + '\n\n---\n*🤖 AI(Gemini)가 자동으로 작성한 PR입니다.*'
+          except Exception as e:
+              print(f'Gemini SDK 호출 실패 또는 JSON 파싱 에러: {e}')
+              sys.exit(1)
+          
+          with open('pr_body.md', 'w', encoding='utf-8') as f:
+              f.write(pr_body)
+          
+          print(f'[{current_branch}] -> [{target_branch}] 로 PR 생성을 시도합니다...')
+          
+          # 4) PR 생성 (Create) 또는 업데이트 (Edit)
+          try:
+              # 먼저 새로운 PR 생성을 시도합니다.
+              subprocess.run([
+                  'gh', 'pr', 'create', 
+                  '--base', target_branch, 
+                  '--head', current_branch, 
+                  '--title', pr_title, 
+                  '--body-file', 'pr_body.md'
+              ], check=True, capture_output=True, text=True)
+              print('✅ 성공적으로 새 PR이 생성되었습니다!')
+          
+          except subprocess.CalledProcessError:
+              # 생성에 실패했다면 (이미 열려있는 PR이 있는 경우) 기존 PR 업데이트
+              print('⚠️ 이미 열려있는 PR이 감지되었습니다. 기존 PR의 내용을 업데이트(Edit)합니다.')
+          
+              try:
+                  subprocess.run([
+                      'gh', 'pr', 'edit', current_branch, 
+                      '--title', pr_title, 
+                      '--body-file', 'pr_body.md'
+                  ], check=True)
+                  print('🔄 기존 PR의 제목과 본문이 최신 AI 요약으로 성공적으로 업데이트되었습니다!')
+              except subprocess.CalledProcessError as edit_e:
+                  print(f'❌ PR 업데이트 실패. 권한이나 다른 문제가 발생했습니다: {edit_e}')
+                  sys.exit(1)
+          EOF
+          
+          # 작성된 파이썬 스크립트 실행
+          python script.py
