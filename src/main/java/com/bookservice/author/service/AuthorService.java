@@ -49,4 +49,10 @@ public class AuthorService {
 		return authorRepository.findById(authorId)
 					.map(AuthorInfo::toAuthor);
 	}
+
+	public Author findByName(String author) {
+		return authorRepository.findByName(author).orElseThrow(
+				() -> new BookException(NOT_FOUND_AUTHOR)
+		);
+	}
 }

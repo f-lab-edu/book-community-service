@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.bookservice.common.exception.ErrorCode.NOT_FOUND_HASH_TAG;
@@ -44,5 +45,15 @@ public class HashTagService {
 	public Optional<HashTagInfo> getHashTagInfo(Long hashTagId) {
 		return hashTagRepository.findById(hashTagId)
 					.map(HashTagInfo::toHashTag);
+	}
+
+	public List<HashTag> findAllByNameIn(List<String> newHashTags) {
+		return hashTagRepository.findAllByNameIn(newHashTags);
+	}
+
+	public void validateAllHashTagsExist(List<HashTag> existsTags, List<String> newHashTags) {
+		if (existsTags.size() != newHashTags.size()) {
+			throw new BookException(NOT_FOUND_HASH_TAG);
+		}
 	}
 }

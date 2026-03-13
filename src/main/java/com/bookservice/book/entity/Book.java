@@ -5,12 +5,14 @@ import com.bookservice.common.time.TimeStamped;
 import com.bookservice.hashtag.entity.HashTag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +20,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @DynamicInsert
-@Table(uniqueConstraints = {
-		@UniqueConstraint(
-				name = "uk_book_title",
-				columnNames = {"title"}
-		)
-})
 public class Book extends TimeStamped {
 	@Id
 	@Column(name = "book_id")
@@ -41,7 +37,7 @@ public class Book extends TimeStamped {
 	private String description;
 
 	@NotNull
-	private String releaseDate;
+	private LocalDate releaseDate;
 
 	@ColumnDefault("0")
 	private Integer viewCount;
@@ -49,17 +45,14 @@ public class Book extends TimeStamped {
 	@ColumnDefault("0")
 	private Integer interestedCount;
 
-	@ColumnDefault("1")
-	private Integer averageRating;
+	@Embedded
+	private Rating rating;
 
 	@ColumnDefault("0")
 	private Integer reviewCount;
 
-	@ColumnDefault("true")
-	private Boolean isFree;
-
-	@ColumnDefault("0")
-	private Integer price;
+	@Embedded
+	private Price price;
 
 	@ManyToOne
 	@JoinColumn(name="author_id")
@@ -68,13 +61,27 @@ public class Book extends TimeStamped {
 	@OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<BookHashTag> bookHashTags = new ArrayList<>();
 
-	@Builder
-	public Book(String title, String thumbnail, String description, String releaseDate, Author author) {
+	@Builder(access = AccessLevel.PRIVATE)
+	public Book(String title, String thumbnail, String description, LocalDate releaseDate, Price price, Author author) {
 		this.title = title;
 		this.thumbnail = thumbnail;
 		this.description = description;
 		this.releaseDate = releaseDate;
+		this.price = price;
 		this.author = author;
+	}
+
+	public static Book create(String title, String thumbnail, String description, LocalDate releaseDate, Boolean isFree, Integer amount, Author author) {
+		Price price = isFree ? new Price().isFree(amount) : new Price().isPaid(amount);
+
+		return Book.builder()
+				.title(title)
+				.thumbnail(thumbnail)
+				.description(description)
+				.releaseDate(releaseDate)
+				.price(price)
+				.author(author)
+				.build();
 	}
 
 	private void addHashTag(HashTag hashTag){
