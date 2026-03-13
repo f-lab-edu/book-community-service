@@ -80,17 +80,20 @@ jobs:
           # 3) 제미나이 API 호출
           try:
               response = client.models.generate_content(
-                  model='gemini-2.5-flash', 
-                  contents=prompt
+                  model='gemini-2.5-flash',
+                  contents=prompt,
+                  config={"response_mime_type": "application/json"}
               )
-          
-              response_text = response.text.replace('```json', '').replace('```', '').strip()
-          
+
+              response_text = response.text.strip()
+
               pr_data = json.loads(response_text)
               pr_title = pr_data['title']
               pr_body = pr_data['body'] + '\n\n---\n*🤖 AI(Gemini)가 자동으로 작성한 PR입니다.*'
           except Exception as e:
               print(f'Gemini SDK 호출 실패 또는 JSON 파싱 에러: {e}')
+              if 'response_text' in locals():
+                  print(f'응답 원문 (처음 500자): {response_text[:500]}')
               sys.exit(1)
           
           with open('pr_body.md', 'w', encoding='utf-8') as f:
