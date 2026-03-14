@@ -15,6 +15,9 @@ public enum ErrorCode {
 	ALREADY_EXIST_COUPON(HttpStatus.CONFLICT, "MEMBER_006", "이미 발급받은 쿠폰입니다."),
 
 	NOT_FOUND_BOOK(HttpStatus.NOT_FOUND, "BOOK_001", "찾을 수 없는 책입니다."),
+	CHECK_FREE_BOOK(HttpStatus.BAD_REQUEST, "BOOK_002", "무료 도서는 가격 입력이 불가합니다."),
+	CHECK_PAID_BOOK(HttpStatus.BAD_REQUEST, "BOOK_003", "유료 도서 가격을 입력해주세요."),
+	CHECK_RATING(HttpStatus.BAD_REQUEST, "BOOK_004", "별점을 확인해주세요."),
 
 	ALREADY_OWNED_BOOK(HttpStatus.NOT_FOUND, "ORDERED_BOOK_001", "이미 구매한 책입니다."),
 

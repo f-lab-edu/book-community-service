@@ -22,7 +22,7 @@ public class BookController {
 
 	private final BookService bookService;
 
-	@PostMapping("/book")
+	@PostMapping
 	public ResponseEntity<SuccessMessage<Void>> registerBook(@Valid @RequestBody BookRegisterRequest request){
 		bookService.registerBook(request);
 		return new ResponseEntity<>(new SuccessMessage<>("책등록성공", null), HttpStatus.CREATED);
