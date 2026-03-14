@@ -93,10 +93,13 @@ public class Book extends TimeStamped {
 		newHashTags.forEach(this::addHashTag);
 	}
 
-	public void update(String title, String thumbnail, String description, List<HashTag> newHashTags) {
+	public void update(String title, String thumbnail, String description, Boolean isFree, Integer amount, List<HashTag> newHashTags) {
+		Price price = isFree ? new Price().isFree(amount) : new Price().isPaid(amount);
+
 		this.title = title;
 		this.thumbnail = thumbnail;
 		this.description = description;
+		this.price = price;
 
 		this.bookHashTags.clear();
 
