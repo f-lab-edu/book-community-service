@@ -1,7 +1,6 @@
 package com.bookservice.book.service;
 
 import com.bookservice.author.entity.Author;
-import com.bookservice.author.repository.AuthorRepository;
 import com.bookservice.author.service.AuthorService;
 import com.bookservice.book.dto.request.BookRegisterRequest;
 import com.bookservice.book.dto.request.BookSearchRequest;
@@ -12,7 +11,6 @@ import com.bookservice.book.repository.BookRepository;
 import com.bookservice.common.aop.DistributedCacheable;
 import com.bookservice.common.exception.BookException;
 import com.bookservice.hashtag.entity.HashTag;
-import com.bookservice.hashtag.repository.HashTagRepository;
 import com.bookservice.hashtag.service.HashTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.bookservice.common.exception.ErrorCode.*;
+import static com.bookservice.common.exception.ErrorCode.NOT_FOUND_BOOK;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +64,8 @@ public class BookService {
 				request.getTitle(),
 				request.getThumbnail(),
 				request.getDescription(),
+				request.isFree(),
+				request.getPrice(),
 				tags
 		);
 	}
@@ -88,6 +88,7 @@ public class BookService {
 		bookRepository.deleteById(bookId);
 	}
 
+	@Transactional
 	public BookResponse getBookInfo(Long bookId) {
 		bookRepository.updateViews(bookId);
 		return bookRepository.findByIdWithHashTags(bookId)
