@@ -1,6 +1,8 @@
 package com.bookservice.book.entity;
 
 import com.bookservice.author.entity.Author;
+import com.bookservice.book.dto.command.BookCreateCommand;
+import com.bookservice.book.dto.command.BookUpdateCommand;
 import com.bookservice.common.time.TimeStamped;
 import com.bookservice.hashtag.entity.HashTag;
 import jakarta.persistence.*;
@@ -71,16 +73,16 @@ public class Book extends TimeStamped {
 		this.author = author;
 	}
 
-	public static Book create(String title, String thumbnail, String description, LocalDate releaseDate, Boolean isFree, Integer amount, Author author) {
-		Price price = isFree ? new Price().isFree(amount) : new Price().isPaid(amount);
+	public static Book create(BookCreateCommand command) {
+		Price price = command.isFree() ? new Price().isFree(command.amount()) : new Price().isPaid(command.amount());
 
 		return Book.builder()
-				.title(title)
-				.thumbnail(thumbnail)
-				.description(description)
-				.releaseDate(releaseDate)
+				.title(command.title())
+				.thumbnail(command.thumbnail())
+				.description(command.description())
+				.releaseDate(command.releaseDate())
 				.price(price)
-				.author(author)
+				.author(command.author())
 				.build();
 	}
 
@@ -93,13 +95,16 @@ public class Book extends TimeStamped {
 		newHashTags.forEach(this::addHashTag);
 	}
 
-	public void update(String title, String thumbnail, String description, List<HashTag> newHashTags) {
-		this.title = title;
-		this.thumbnail = thumbnail;
-		this.description = description;
+	public void update(BookUpdateCommand command) {
+		Price price = command.isFree() ? new Price().isFree(command.amount()) : new Price().isPaid(command.amount());
+
+		this.title = command.title();
+		this.thumbnail = command.thumbnail();
+		this.description = command.description();
+		this.price = price;
 
 		this.bookHashTags.clear();
 
-		this.addHashTags(newHashTags);
+		this.addHashTags(command.newHashTags());
 	}
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +56,8 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 									 .orderBy(book.id.desc())
 									 .offset(pageable.getOffset())
 									 .limit(pageable.getPageSize())
+									 .where(eqTitle(searchRequest.getSearchTitle()))
+									 .where(betweenPrice(searchRequest.getMinPrice(), searchRequest.getMaxPrice()))
 									 .fetch();
 
 		return queryFactory
@@ -74,10 +77,10 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 											   book.releaseDate,
 											   book.viewCount,
 											   book.interestedCount,
-											   book.averageRating,
+											   book.rating.averageRating,
 											   book.reviewCount,
-											   book.isFree,
-											   book.price,
+											   book.price.isFree,
+											   book.price.amount,
 											   book.author.name,
 											   list(hashTag.name)
 									   )
@@ -93,7 +96,7 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 									 .select(book.id)
 									 .from(book)
 									 .where(
-											 book.releaseDate.goe(String.valueOf(oneWeekAgo))
+											 book.releaseDate.goe(LocalDate.from(oneWeekAgo))
 									 )
 									 .orderBy(
 											 book.viewCount.desc(),
@@ -126,10 +129,10 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 											   book.releaseDate,
 											   book.viewCount,
 											   book.interestedCount,
-											   book.averageRating,
+											   book.rating.averageRating,
 											   book.reviewCount,
-											   book.isFree,
-											   book.price,
+											   book.price.isFree,
+											   book.price.amount,
 											   book.author.name,
 											   list(hashTag.name)
 									   )
@@ -145,10 +148,10 @@ public class BookRepositoryCustomImpl implements BookRepositoryCustom {
 		if (minPrice == null && maxPrice == null) {
 			return null;
 		} else if (minPrice == null) {
-			return book.price.loe(maxPrice);
+			return book.price.amount.loe(maxPrice);
 		} else if (maxPrice == null) {
-			return book.price.goe(minPrice);
+			return book.price.amount.goe(minPrice);
 		}
-		return book.price.between(minPrice, maxPrice);
+		return book.price.amount.between(minPrice, maxPrice);
 	}
 }
