@@ -2,6 +2,8 @@ package com.bookservice.book.service;
 
 import com.bookservice.author.entity.Author;
 import com.bookservice.author.service.AuthorService;
+import com.bookservice.book.dto.command.BookCreateCommand;
+import com.bookservice.book.dto.command.BookUpdateCommand;
 import com.bookservice.book.dto.request.BookRegisterRequest;
 import com.bookservice.book.dto.request.BookSearchRequest;
 import com.bookservice.book.dto.request.BookUpdateRequest;
@@ -35,7 +37,7 @@ public class BookService {
 		Author author = authorService.findByName(request.getAuthor());
 		List<HashTag> hashTags = findAllByNameIn(request.getHashTags());
 
-		Book book = Book.create(
+		Book book = Book.create(new BookCreateCommand(
 				request.getTitle(),
 				request.getThumbnail(),
 				request.getDescription(),
@@ -43,6 +45,7 @@ public class BookService {
 				request.isFree(),
 				request.getPrice(),
 				author
+			)
 		);
 
 		book.addHashTags(hashTags);
@@ -60,13 +63,14 @@ public class BookService {
 
 		List<HashTag> tags = findAllByNameIn(request.getHashTags());
 
-		book.update(
+		book.update(new BookUpdateCommand(
 				request.getTitle(),
 				request.getThumbnail(),
 				request.getDescription(),
 				request.isFree(),
 				request.getPrice(),
 				tags
+			)
 		);
 	}
 
